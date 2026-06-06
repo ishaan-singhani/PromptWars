@@ -153,24 +153,6 @@ export default function App() {
         {/* Main Page Area */}
         <main className="main-content">
           
-          {/* Mock Mode Alert Indicator */}
-          {isUsingMock() && (
-            <div style={{
-              fontSize: "0.8rem",
-              backgroundColor: "rgba(111, 255, 233, 0.05)",
-              border: "1px solid rgba(111, 255, 233, 0.2)",
-              color: "var(--color-text-secondary)",
-              padding: "8px 12px",
-              borderRadius: "var(--border-radius-sm)",
-              textAlign: "center",
-              display: "flex",
-              justifyContent: "center",
-              gap: "6px"
-            }}>
-              <span>⚙️</span> Local Database Sandbox active. Complete check-ins to test logs.
-            </div>
-          )}
-
           {/* Daily Nudge Banner */}
           {showNudge && !nudgeDismissed && (
             <DailyNudgeBanner
