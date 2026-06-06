@@ -16,7 +16,7 @@
   
   --color-text-primary: #FFFFFF;
   --color-text-secondary: #C3CFD9;
-  --color-text-muted: #8E9AAF;
+  --color-text-muted: #A8B3C4;
   --color-accent: #3A506B;
   --color-accent-hover: #4A6384;
   --color-error: #FF6B6B;
@@ -40,6 +40,37 @@
   --transition-fast: 0.15s ease;
   --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* --- LIGHT THEME TOKENS --- */
+[data-theme="light"] {
+  --bg-dark: #ECEFF1;
+  --bg-body: #F5F7FA;
+  --bg-card: rgba(255, 255, 255, 0.75);
+  --bg-card-solid: #FFFFFF;
+  --bg-card-hover: rgba(255, 255, 255, 0.9);
+  --bg-input: rgba(230, 235, 242, 0.85);
+  
+  --color-mint: #00796B;
+  --color-mint-hover: #00695C;
+  --color-mint-light: rgba(0, 137, 123, 0.1);
+  --color-mint-glow: rgba(0, 137, 123, 0.2);
+  
+  --color-text-primary: #1E293B;
+  --color-text-secondary: #475569;
+  --color-text-muted: #64748B;
+  --color-accent: #E2E8F0;
+  --color-accent-hover: #CBD5E0;
+  --border-card: 1px solid rgba(15, 23, 42, 0.08);
+  --border-card-mint: 1px solid rgba(0, 137, 123, 0.25);
+}
+
+[data-theme="light"] body {
+  background-image: radial-gradient(circle at 10% 20%, rgba(226, 232, 240, 0.5) 0%, rgba(245, 247, 250, 0.95) 90%);
+}
+
+[data-theme="light"] select.form-input {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>");
 }
 
 /* --- RESET & ACCESSIBILITY BASE --- */
@@ -189,6 +220,13 @@ button, input, select, textarea {
   padding-bottom: env(safe-area-inset-bottom);
 }
 
+.nav-tabs-list {
+  display: flex;
+  flex: 1;
+  justify-content: space-around;
+  align-items: center;
+}
+
 .nav-item {
   background: none;
   border: none;
@@ -268,6 +306,15 @@ button, input, select, textarea {
     background: linear-gradient(135deg, var(--color-text-primary) 30%, var(--color-mint) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+  }
+
+  .nav-tabs-list {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+    gap: 2rem;
+    flex: initial;
   }
 
   .nav-item {
@@ -1199,4 +1246,31 @@ select.form-input {
 
 .btn-banner-close:hover {
   color: var(--color-text-primary);
+}
+
+.theme-toggle-btn {
+  background: var(--bg-input);
+  border: var(--border-card);
+  border-radius: 50%;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  font-size: 1.1rem;
+  color: var(--color-text-primary);
+  transition: var(--transition-fast);
+  padding: 0;
+  box-shadow: var(--shadow-sm);
+}
+
+.theme-toggle-btn:hover {
+  background: var(--color-accent);
+  border-color: var(--color-mint);
+  transform: scale(1.05);
+}
+
+.theme-toggle-btn:active {
+  transform: scale(0.95);
 }

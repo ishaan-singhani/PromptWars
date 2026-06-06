@@ -1,5 +1,16 @@
-import React from "react";
+import PropTypes from "prop-types";
 
+/**
+ * WellnessTip component.
+ * Displays a warm, empathetic reframe message returned by AI topper or fallback template.
+ * 
+ * @param {object} props The component props.
+ * @param {string} props.tip Generative reframe tip content.
+ * @param {boolean} props.isLoading True if AI generation request is active.
+ * @param {string} props.studentName Student's configured name.
+ * @param {string} props.targetExam Target competitive exam.
+ * @returns {React.ReactElement|null} Card showing the tip, or null if no tip.
+ */
 export default function WellnessTip({ tip, isLoading, studentName, targetExam }) {
   if (isLoading) {
     return (
@@ -34,3 +45,10 @@ export default function WellnessTip({ tip, isLoading, studentName, targetExam })
     </div>
   );
 }
+
+WellnessTip.propTypes = {
+  tip: PropTypes.string,
+  isLoading: PropTypes.bool.isRequired,
+  studentName: PropTypes.string,
+  targetExam: PropTypes.string
+};

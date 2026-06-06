@@ -1,5 +1,7 @@
-import React, { useState } from "react";
+import { useState } from "react";
+import PropTypes from "prop-types";
 import { saveOnboarding } from "../firebase";
+import { EXAMS_LIST } from "../constants";
 
 export default function Onboarding({ uid, onComplete }) {
   const [name, setName] = useState("");
@@ -7,16 +9,6 @@ export default function Onboarding({ uid, onComplete }) {
   const [examDate, setExamDate] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
-
-  const examsList = [
-    { value: "NEET", label: "NEET (Medical)" },
-    { value: "JEE", label: "JEE (Engineering)" },
-    { value: "CUET", label: "CUET (University Entrance)" },
-    { value: "CAT", label: "CAT (Management)" },
-    { value: "GATE", label: "GATE (Engineering/Science)" },
-    { value: "UPSC", label: "UPSC (Civil Services)" },
-    { value: "Board Exams", label: "Board Exams (Class 10/12)" }
-  ];
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -87,7 +79,7 @@ export default function Onboarding({ uid, onComplete }) {
               disabled={isSubmitting}
             >
               <option value="" disabled>Select your exam</option>
-              {examsList.map((exam) => (
+              {EXAMS_LIST.map((exam) => (
                 <option key={exam.value} value={exam.value}>
                   {exam.label}
                 </option>
@@ -127,3 +119,8 @@ export default function Onboarding({ uid, onComplete }) {
     </div>
   );
 }
+
+Onboarding.propTypes = {
+  uid: PropTypes.string.isRequired,
+  onComplete: PropTypes.func.isRequired
+};

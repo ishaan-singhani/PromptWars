@@ -1,8 +1,35 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
+import PropTypes from "prop-types";
 import { saveMoodCheckIn, getMoodHistory } from "../firebase";
 import { generateWellnessTip } from "../gemini";
-import WellnessTip from "./WellnessTip";
+import MoodSelector from "./MoodSelector";
+import TriggerSelector from "./TriggerSelector";
+import LoggedStateCard from "./LoggedStateCard";
 
+/**
+ * Format today's date as a local YYYY-MM-DD string.
+ * @returns {string} The formatted local date string.
+ */
+const getTodayStr = () => {
+  const d = new Date();
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
+/**
+ * DailyCheckIn component.
+ * Allows the student to select their current mood and primary stress trigger,
+ * saving the check-in and retrieving personalized wellness/reframe advice.
+ * 
+ * @param {object} props The component props.
+ * @param {string} props.uid Unique user session ID.
+ * @param {object} props.studentInfo Profile details of the student.
+ * @param {object} props.streakData Check-in streak tracking details.
+ * @param {function} props.onCheckInComplete Callback when check-in is submitted.
+ * @returns {React.ReactElement} Daily Check-In workspace panel.
+ */
 export default function DailyCheckIn({ uid, studentInfo, streakData, onCheckInComplete }) {
   const [selectedMood, setSelectedMood] = useState(null);
   const [selectedTrigger, setSelectedTrigger] = useState(null);
@@ -13,52 +40,17 @@ export default function DailyCheckIn({ uid, studentInfo, streakData, onCheckInCo
   const [aiTip, setAiTip] = useState("");
   const [isLoadingTip, setIsLoadingTip] = useState(false);
 
-  const moods = [
-    { value: "Energized", emoji: "😄", label: "Energized" },
-    { value: "Okay", emoji: "🙂", label: "Okay" },
-    { value: "Tired", emoji: "😐", label: "Tired" },
-    { value: "Anxious", emoji: "😟", label: "Anxious" },
-    { value: "Burnt Out", emoji: "😔", label: "Burnt Out" }
-  ];
-
-  const triggers = [
-    "Study Load",
-    "Self-Doubt",
-    "Family Pressure",
-    "Fear of Failure",
-    "Sleep Issues",
-    "Comparison with Others",
-    "Physical Health"
-  ];
-
-  // Format date helper to check YYYY-MM-DD
-  const getTodayStr = () => {
-    const d = new Date();
-    const year = d.getFullYear();
-    const month = String(d.getMonth() + 1).padStart(2, "0");
-    const day = String(d.getDate()).padStart(2, "0");
-    return `${year}-${month}-${day}`;
-  };
-
   useEffect(() => {
-    // Check if the user has checked in today based on streak or checking today's entries
     const checkTodayStatus = async () => {
       const todayStr = getTodayStr();
       if (streakData?.lastCheckInDate === todayStr) {
         setHasCheckedInToday(true);
-        // Fetch history to extract today's mood and trigger
         try {
           setIsLoadingTip(true);
           const history = await getMoodHistory(uid);
-          const todayLog = history.find(entry => {
-            const entryDate = new Date(entry.timestamp);
-            const entryDateStr = `${entryDate.getFullYear()}-${String(entryDate.getMonth() + 1).padStart(2, "0")}-${String(entryDate.getDate()).padStart(2, "0")}`;
-            return entryDateStr === todayStr;
-          });
-
+          const todayLog = history.find(e => new Date(e.timestamp).toISOString().split("T")[0] === todayStr);
           if (todayLog) {
             setTodaysEntry(todayLog);
-            // Re-generate or fetch the tip based on today's logged mood/trigger
             const tip = await generateWellnessTip(studentInfo, todayLog.mood, todayLog.trigger);
             setAiTip(tip);
           }
@@ -73,7 +65,6 @@ export default function DailyCheckIn({ uid, studentInfo, streakData, onCheckInCo
         setAiTip("");
       }
     };
-
     checkTodayStatus();
   }, [uid, streakData, studentInfo]);
 
@@ -92,10 +83,7 @@ export default function DailyCheckIn({ uid, studentInfo, streakData, onCheckInCo
     setError("");
 
     try {
-      // 1. Save to Database
       const result = await saveMoodCheckIn(uid, selectedMood, selectedTrigger);
-      
-      // 2. Fetch AI tip
       const tipText = await generateWellnessTip(studentInfo, selectedMood, selectedTrigger);
       setAiTip(tipText);
       setTodaysEntry({
@@ -105,7 +93,6 @@ export default function DailyCheckIn({ uid, studentInfo, streakData, onCheckInCo
       });
       setHasCheckedInToday(true);
 
-      // 3. Trigger parent callbacks to refresh streak and history
       if (onCheckInComplete) {
         onCheckInComplete(result.streak);
       }
@@ -119,32 +106,13 @@ export default function DailyCheckIn({ uid, studentInfo, streakData, onCheckInCo
   };
 
   if (hasCheckedInToday) {
-    const activeMood = moods.find(m => m.value === todaysEntry?.mood);
     return (
-      <div className="checkin-section">
-        <div className="card" style={{ display: "flex", flexDirection: "column", gap: "1rem", textAlign: "center" }}>
-          <h2>Check-In Logged!</h2>
-          <p style={{ color: "var(--color-text-secondary)", fontSize: "0.95rem" }}>
-            You logged your mood for today. Great job showing up for yourself.
-          </p>
-          <div style={{ display: "flex", justifyContent: "center", gap: "10px", margin: "10px 0" }}>
-            <div className="mood-btn selected" style={{ cursor: "default", flex: "none", minWidth: "120px" }}>
-              <span className="mood-emoji">{activeMood?.emoji || "🙂"}</span>
-              <span className="mood-label">{activeMood?.label || todaysEntry?.mood}</span>
-            </div>
-          </div>
-          <div className="nudge-bubble" style={{ justifyContent: "center", borderStyle: "solid" }}>
-            🎯 Affected by: <strong>{todaysEntry?.trigger}</strong>
-          </div>
-        </div>
-
-        <WellnessTip 
-          tip={aiTip} 
-          isLoading={isLoadingTip} 
-          studentName={studentInfo?.name}
-          targetExam={studentInfo?.targetExam}
-        />
-      </div>
+      <LoggedStateCard
+        todaysEntry={todaysEntry}
+        aiTip={aiTip}
+        isLoadingTip={isLoadingTip}
+        studentInfo={studentInfo}
+      />
     );
   }
 
@@ -156,47 +124,28 @@ export default function DailyCheckIn({ uid, studentInfo, streakData, onCheckInCo
           Be honest with yourself. There are no wrong answers here.
         </p>
 
-        <div className="mood-selector" role="radiogroup" aria-label="Daily mood selector">
-          {moods.map((m) => (
-            <button
-              key={m.value}
-              className={`mood-btn ${selectedMood === m.value ? "selected" : ""}`}
-              onClick={() => {
-                setSelectedMood(m.value);
-                setError("");
-              }}
-              role="radio"
-              aria-checked={selectedMood === m.value}
-              aria-label={`Feel ${m.label}`}
-              disabled={isSubmitting}
-            >
-              <span className="mood-emoji" aria-hidden="true">{m.emoji}</span>
-              <span className="mood-label">{m.label}</span>
-            </button>
-          ))}
-        </div>
+        <MoodSelector
+          selectedMood={selectedMood}
+          onSelectMood={(m) => {
+            setSelectedMood(m);
+            setError("");
+          }}
+          disabled={isSubmitting}
+        />
 
         <div className={`followup-container ${selectedMood ? "expanded" : ""}`}>
           <div className="divider" />
           <h3 style={{ fontSize: "1.05rem", fontWeight: "700", marginBottom: "0.5rem" }}>
             What's affecting you most today?
           </h3>
-          <div className="trigger-grid" role="group" aria-label="Stress triggers selection">
-            {triggers.map((t) => (
-              <button
-                key={t}
-                className={`trigger-btn ${selectedTrigger === t ? "selected" : ""}`}
-                onClick={() => {
-                  setSelectedTrigger(t);
-                  setError("");
-                }}
-                aria-label={`Trigger: ${t}`}
-                disabled={isSubmitting}
-              >
-                {t}
-              </button>
-            ))}
-          </div>
+          <TriggerSelector
+            selectedTrigger={selectedTrigger}
+            onSelectTrigger={(t) => {
+              setSelectedTrigger(t);
+              setError("");
+            }}
+            disabled={isSubmitting}
+          />
         </div>
 
         {selectedMood && selectedTrigger && (
@@ -210,7 +159,7 @@ export default function DailyCheckIn({ uid, studentInfo, streakData, onCheckInCo
               className="btn-primary"
               onClick={handleSubmit}
               disabled={isSubmitting}
-              aria-label="Submit check in"
+              aria-label="Submit Check-In & Get AI Tip"
             >
               {isSubmitting ? "Saving entry..." : "Submit Check-In & Get AI Tip"}
             </button>
@@ -220,3 +169,16 @@ export default function DailyCheckIn({ uid, studentInfo, streakData, onCheckInCo
     </div>
   );
 }
+
+DailyCheckIn.propTypes = {
+  uid: PropTypes.string.isRequired,
+  studentInfo: PropTypes.shape({
+    name: PropTypes.string,
+    targetExam: PropTypes.string
+  }).isRequired,
+  streakData: PropTypes.shape({
+    currentStreak: PropTypes.number,
+    lastCheckInDate: PropTypes.string
+  }).isRequired,
+  onCheckInComplete: PropTypes.func.isRequired
+};

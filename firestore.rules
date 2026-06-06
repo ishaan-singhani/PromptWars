@@ -1,0 +1,50 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper function to check if the caller is the owner of the user resource
+    function isOwner(userId) {
+      return request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Students can read and write only their own onboarding profiles
+    match /students/{userId} {
+      allow read: if isOwner(userId);
+      allow write: if isOwner(userId)
+        && request.resource.data.name is string
+        && request.resource.data.name.size() > 0
+        && request.resource.data.name.size() <= 100
+        && request.resource.data.targetExam is string
+        && (request.resource.data.examDate == null || request.resource.data.examDate is string)
+        && request.resource.data.onboardedAt is string;
+      
+      // Students can read and write only their own nested mood check-ins
+      match /checkins/{checkinId} {
+        allow read: if isOwner(userId);
+        allow write: if isOwner(userId)
+          && request.resource.data.mood is string
+          && request.resource.data.mood in ['Energized', 'Okay', 'Tired', 'Anxious', 'Burnt Out']
+          && request.resource.data.trigger is string
+          && request.resource.data.trigger in ['Study Load', 'Self-Doubt', 'Family Pressure', 'Fear of Failure', 'Sleep Issues', 'Comparison with Others', 'Physical Health'];
+      }
+      
+      // Students can read and write only their own nested private journals
+      match /journals/{journalId} {
+        allow read: if isOwner(userId);
+        allow write: if isOwner(userId)
+          && request.resource.data.text is string
+          && request.resource.data.text.size() > 0
+          && request.resource.data.text.size() <= 10000;
+      }
+    }
+    
+    // Students can read and write only their own streak metrics
+    match /streaks/{userId} {
+      allow read: if isOwner(userId);
+      allow write: if isOwner(userId)
+        && request.resource.data.currentStreak is int
+        && request.resource.data.currentStreak >= 0
+        && (request.resource.data.lastCheckInDate == null || request.resource.data.lastCheckInDate is string);
+    }
+  }
+}
