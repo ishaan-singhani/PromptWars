@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 import ErrorBoundary from "./ErrorBoundary";
 
 /**
@@ -23,5 +24,7 @@ const LoadingScreen = React.memo(function LoadingScreen() {
     </ErrorBoundary>
   );
 });
+
+LoadingScreen.propTypes = {};
 
 export default LoadingScreen;

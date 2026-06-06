@@ -1,3 +1,5 @@
+import PropTypes from "prop-types";
+
 /**
  * OnboardingIntro component.
  * Displays the branding details on the onboarding page.
@@ -16,3 +18,5 @@ export default function OnboardingIntro() {
     </div>
   );
 }
+
+OnboardingIntro.propTypes = {};

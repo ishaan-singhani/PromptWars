@@ -1,4 +1,5 @@
 import { useState, memo } from "react";
+import PropTypes from "prop-types";
 import { MOTIVATIONAL_QUOTES } from "../constants";
 
 /**
@@ -63,5 +64,7 @@ const MotivationalQuotes = memo(function MotivationalQuotes() {
     </div>
   );
 });
+
+MotivationalQuotes.propTypes = {};
 
 export default MotivationalQuotes;

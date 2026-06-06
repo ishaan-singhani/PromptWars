@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import PropTypes from "prop-types";
 
 /**
  * BoxBreathing component.
@@ -149,3 +150,5 @@ export default function BoxBreathing() {
     </div>
   );
 }
+
+BoxBreathing.propTypes = {};
