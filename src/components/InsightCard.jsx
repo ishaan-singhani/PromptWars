@@ -1,3 +1,4 @@
+import React from "react";
 import PropTypes from "prop-types";
 
 /**
@@ -8,7 +9,7 @@ import PropTypes from "prop-types";
  * @param {object} props.insight Insight object with fields { title, text }.
  * @returns {React.ReactElement|null} Card showing personalized reframe advice.
  */
-export default function InsightCard({ insight }) {
+const InsightCard = React.memo(function InsightCard({ insight }) {
   if (!insight) return null;
 
   return (
@@ -17,7 +18,7 @@ export default function InsightCard({ insight }) {
       <p className="insight-text">{insight.text}</p>
     </div>
   );
-}
+});
 
 InsightCard.propTypes = {
   insight: PropTypes.shape({
@@ -25,3 +26,5 @@ InsightCard.propTypes = {
     text: PropTypes.string.isRequired
   })
 };
+
+export default InsightCard;

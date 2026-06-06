@@ -1,3 +1,4 @@
+import React from "react";
 import PropTypes from "prop-types";
 
 /**
@@ -10,7 +11,7 @@ import PropTypes from "prop-types";
  * @param {function} props.onDismiss Callback when the banner is closed.
  * @returns {React.ReactElement} The nudge banner layout.
  */
-export default function DailyNudgeBanner({ studentName, onLogMoodClick, onDismiss }) {
+const DailyNudgeBanner = React.memo(function DailyNudgeBanner({ studentName, onLogMoodClick, onDismiss }) {
   return (
     <div className="notification-banner" role="status" aria-live="polite">
       <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
@@ -38,10 +39,12 @@ export default function DailyNudgeBanner({ studentName, onLogMoodClick, onDismis
       </div>
     </div>
   );
-}
+});
 
 DailyNudgeBanner.propTypes = {
   studentName: PropTypes.string.isRequired,
   onLogMoodClick: PropTypes.func.isRequired,
   onDismiss: PropTypes.func.isRequired
 };
+
+export default DailyNudgeBanner;

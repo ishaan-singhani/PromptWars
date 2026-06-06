@@ -1,7 +1,9 @@
 import { useState } from "react";
 import PropTypes from "prop-types";
 import { saveOnboarding } from "../firebase";
+import { logError } from "../utils/logger";
 import { EXAMS_LIST } from "../constants";
+import { isValidStudentInfo } from "../utils/validation";
 
 export default function Onboarding({ uid, onComplete }) {
   const [name, setName] = useState("");
@@ -21,6 +23,12 @@ export default function Onboarding({ uid, onComplete }) {
       return;
     }
 
+    const formData = { name: name.trim(), targetExam, examDate: examDate || null };
+    if (!isValidStudentInfo(formData)) {
+      setError("Please provide valid information for all required fields.");
+      return;
+    }
+
     setIsSubmitting(true);
     setError("");
 
@@ -34,7 +42,7 @@ export default function Onboarding({ uid, onComplete }) {
       await saveOnboarding(uid, onboardingData);
       onComplete(onboardingData);
     } catch (err) {
-      console.error("Failed to save onboarding data:", err);
+      logError("Failed to save onboarding data", err);
       setError("Something went wrong. Please try again.");
     } finally {
       setIsSubmitting(false);

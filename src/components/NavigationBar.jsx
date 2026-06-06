@@ -1,3 +1,4 @@
+import React from "react";
 import PropTypes from "prop-types";
 
 /**
@@ -11,7 +12,7 @@ import PropTypes from "prop-types";
  * @param {function} props.toggleTheme Callback function to switch theme setting.
  * @returns {React.ReactElement} The Navigation menu.
  */
-export default function NavigationBar({ activeTab, setActiveTab, theme, toggleTheme }) {
+const NavigationBar = React.memo(function NavigationBar({ activeTab, setActiveTab, theme, toggleTheme }) {
   return (
     <nav className="bottom-nav" aria-label="Primary navigation menu">
       <div className="nav-tabs-list" role="tablist" aria-label="App navigation tabs">
@@ -76,7 +77,7 @@ export default function NavigationBar({ activeTab, setActiveTab, theme, toggleTh
       </button>
     </nav>
   );
-}
+});
 
 NavigationBar.propTypes = {
   activeTab: PropTypes.string.isRequired,
@@ -84,3 +85,5 @@ NavigationBar.propTypes = {
   theme: PropTypes.string.isRequired,
   toggleTheme: PropTypes.func.isRequired
 };
+
+export default NavigationBar;

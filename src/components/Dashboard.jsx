@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import PropTypes from "prop-types";
 import { getMoodHistory } from "../firebase";
+import { logError } from "../utils/logger";
 import EmptyState from "./EmptyState";
 import StatsRow from "./StatsRow";
 import MoodTrendChart from "./MoodTrendChart";
@@ -46,7 +47,7 @@ export default function Dashboard({ uid, studentInfo }) {
           setHistory(data);
         }
       } catch (err) {
-        console.error("Failed to load mood history:", err);
+        logError("Failed to load mood history", err);
       } finally {
         if (active) {
           setLoading(false);
@@ -60,11 +61,7 @@ export default function Dashboard({ uid, studentInfo }) {
     };
   }, [uid]);
 
-  /**
-   * Processes the history entries to map them to the last 7 calendar days.
-   * @returns {array} Chronological array of daily mood logs.
-   */
-  const processSevenDaysData = () => {
+  const lastSevenDays = useMemo(() => {
     const days = [];
     const today = new Date();
     
@@ -91,13 +88,9 @@ export default function Dashboard({ uid, studentInfo }) {
     });
 
     return days;
-  };
+  }, [history]);
 
-  /**
-   * Identifies the most common stress trigger log in the user's history.
-   * @returns {object} Object describing top trigger name and count.
-   */
-  const getMostCommonTrigger = () => {
+  const topTrigger = useMemo(() => {
     const counts = {};
     history.forEach(entry => {
       if (entry.trigger) {
@@ -115,21 +108,15 @@ export default function Dashboard({ uid, studentInfo }) {
     });
 
     return { trigger: mainTrigger, count: maxCount };
-  };
+  }, [history]);
 
-  /**
-   * Generates personalized study and wellness encouragement.
-   * @returns {object|null} The title and text of the generated insight card.
-   */
-  const generateInsights = () => {
-    const lastSevenDays = processSevenDaysData();
+  const insight = useMemo(() => {
     const checkedInDays = lastSevenDays.filter(d => d.value !== null);
     if (checkedInDays.length === 0) return null;
 
     const anxiousCount = history.filter(h => h.mood === "Anxious").length;
     const burntOutCount = history.filter(h => h.mood === "Burnt Out").length;
     const tiredCount = history.filter(h => h.mood === "Tired").length;
-    const topTrigger = getMostCommonTrigger();
 
     if (anxiousCount >= 3) {
       return {
@@ -163,7 +150,7 @@ export default function Dashboard({ uid, studentInfo }) {
       title: "Keep Up the Tracking!",
       text: "You're building a consistent habit of checking in with yourself. Acknowledging your emotions helps you stay grounded amidst exam preparation pressure. Keep tracking, and remember your worth is separate from any test rank."
     };
-  };
+  }, [history, lastSevenDays, topTrigger, studentInfo]);
 
   if (loading) {
     return (
@@ -176,10 +163,6 @@ export default function Dashboard({ uid, studentInfo }) {
   if (history.length === 0) {
     return <EmptyState />;
   }
-
-  const lastSevenDays = processSevenDaysData();
-  const topTrigger = getMostCommonTrigger();
-  const insight = generateInsights();
 
   return (
     <div className="dashboard-grid">

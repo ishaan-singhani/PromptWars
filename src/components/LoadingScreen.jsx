@@ -1,10 +1,11 @@
+import React from "react";
 import ErrorBoundary from "./ErrorBoundary";
 
 /**
  * LoadingScreen component to display authentication or loading spinner.
  * @returns {React.ReactElement} The loading screen.
  */
-export default function LoadingScreen() {
+const LoadingScreen = React.memo(function LoadingScreen() {
   return (
     <ErrorBoundary>
       <div style={{
@@ -21,4 +22,6 @@ export default function LoadingScreen() {
       </div>
     </ErrorBoundary>
   );
-}
+});
+
+export default LoadingScreen;

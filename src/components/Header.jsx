@@ -1,3 +1,4 @@
+import React from "react";
 import PropTypes from "prop-types";
 
 /**
@@ -10,7 +11,7 @@ import PropTypes from "prop-types";
  * @param {number} props.currentStreak Current check-in streak.
  * @returns {React.ReactElement} The rendered Header component.
  */
-export default function Header({ theme, toggleTheme, currentStreak }) {
+const Header = React.memo(function Header({ theme, toggleTheme, currentStreak }) {
   return (
     <header className="app-header">
       <div className="brand-section">
@@ -35,10 +36,12 @@ export default function Header({ theme, toggleTheme, currentStreak }) {
       </div>
     </header>
   );
-}
+});
 
 Header.propTypes = {
   theme: PropTypes.string.isRequired,
   toggleTheme: PropTypes.func.isRequired,
   currentStreak: PropTypes.number.isRequired
 };
+
+export default Header;

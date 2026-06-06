@@ -15,6 +15,7 @@ import {
   Timestamp
 } from "firebase/firestore";
 import DOMPurify from "dompurify";
+import { logWarn } from "./utils/logger";
 
 // Read variables from import.meta.env
 const firebaseConfig = {
@@ -43,7 +44,7 @@ if (!useMock) {
     auth = getAuth(app);
     db = getFirestore(app);
   } catch (error) {
-    console.warn("MindBoard: Failed to initialize Firebase. Falling back to local storage mock mode.", error);
+    logWarn("Firebase init failed, falling back to local storage mock mode", error);
     useMock = true;
   }
 }

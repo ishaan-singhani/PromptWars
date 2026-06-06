@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, memo } from "react";
 import { MOTIVATIONAL_QUOTES } from "../constants";
 
 /**
@@ -7,7 +7,7 @@ import { MOTIVATIONAL_QUOTES } from "../constants";
  * 
  * @returns {React.ReactElement} Quotes dashboard segment.
  */
-export default function MotivationalQuotes() {
+const MotivationalQuotes = memo(function MotivationalQuotes() {
   const [currentQuote, setCurrentQuote] = useState(MOTIVATIONAL_QUOTES[0]);
 
   /**
@@ -62,4 +62,6 @@ export default function MotivationalQuotes() {
       </div>
     </div>
   );
-}
+});
+
+export default MotivationalQuotes;

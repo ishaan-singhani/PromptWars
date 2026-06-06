@@ -1,3 +1,4 @@
+import { memo } from "react";
 import PropTypes from "prop-types";
 
 /**
@@ -11,7 +12,7 @@ import PropTypes from "prop-types";
  * @param {string} props.targetExam Target competitive exam.
  * @returns {React.ReactElement|null} Card showing the tip, or null if no tip.
  */
-export default function WellnessTip({ tip, isLoading, studentName, targetExam }) {
+const WellnessTip = memo(function WellnessTip({ tip, isLoading, studentName, targetExam }) {
   if (isLoading) {
     return (
       <div className="card loading-tip">
@@ -44,7 +45,7 @@ export default function WellnessTip({ tip, isLoading, studentName, targetExam })
       </p>
     </div>
   );
-}
+});
 
 WellnessTip.propTypes = {
   tip: PropTypes.string,
@@ -52,3 +53,5 @@ WellnessTip.propTypes = {
   studentName: PropTypes.string,
   targetExam: PropTypes.string
 };
+
+export default WellnessTip;

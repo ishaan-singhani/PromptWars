@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import { saveJournalEntry, getJournalEntries } from "../firebase";
+import { logError } from "../utils/logger";
 import { JOURNAL_PROMPTS } from "../constants";
 
 /**
@@ -29,7 +30,7 @@ export default function FiveMinJournal({ uid }) {
         }
       })
       .catch((err) => {
-        console.error("Failed to load journal logs:", err);
+        logError("Failed to load journal logs", err);
       })
       .finally(() => {
         if (active) {
@@ -56,7 +57,7 @@ export default function FiveMinJournal({ uid }) {
       setJournalStatus("Journal saved privately.");
       setTimeout(() => setJournalStatus(""), 4000);
     } catch (err) {
-      console.error("Save journal error:", err);
+      logError("Save journal error", err);
       setJournalStatus("Failed to save. Try again.");
     } finally {
       setIsSavingJournal(false);

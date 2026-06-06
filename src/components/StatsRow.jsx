@@ -1,3 +1,4 @@
+import React from "react";
 import PropTypes from "prop-types";
 
 /**
@@ -9,7 +10,7 @@ import PropTypes from "prop-types";
  * @param {string|null} props.topTrigger The most frequent stress trigger logged.
  * @returns {React.ReactElement} Metric widgets container.
  */
-export default function StatsRow({ currentStreak, topTrigger }) {
+const StatsRow = React.memo(function StatsRow({ currentStreak, topTrigger }) {
   return (
     <div className="dash-stats-row">
       <div className="stat-card">
@@ -24,9 +25,11 @@ export default function StatsRow({ currentStreak, topTrigger }) {
       </div>
     </div>
   );
-}
+});
 
 StatsRow.propTypes = {
   currentStreak: PropTypes.number,
   topTrigger: PropTypes.string
 };
+
+export default StatsRow;

@@ -1,4 +1,4 @@
-import { useState, useEffect, lazy, Suspense } from "react";
+import { useState, useEffect, useCallback, lazy, Suspense } from "react";
 import { 
   loginStudent, 
   fetchOnboarding, 
@@ -6,6 +6,7 @@ import {
   onAuthStateChangedListener,
   isUsingMock 
 } from "./firebase";
+import { logError } from "./utils/logger";
 import Onboarding from "./components/Onboarding";
 import DailyCheckIn from "./components/DailyCheckIn";
 import ErrorBoundary from "./components/ErrorBoundary";
@@ -59,9 +60,9 @@ export default function App() {
   /**
    * Toggles the color theme between light and dark modes.
    */
-  const toggleTheme = () => {
+  const toggleTheme = useCallback(() => {
     setTheme(prev => (prev === "dark" ? "light" : "dark"));
-  };
+  }, []);
 
   useEffect(() => {
     // Establish Authentication Listener
@@ -87,7 +88,7 @@ export default function App() {
             }
           }
         } catch (err) {
-          console.error("Auth initialization error:", err);
+          logError("Auth initialization error", err);
         } finally {
           setLoading(false);
         }
@@ -96,7 +97,7 @@ export default function App() {
         try {
           await loginStudent();
         } catch (err) {
-          console.error("Anonymous authentication failed:", err);
+          logError("Anonymous authentication failed", err);
           setLoading(false);
         }
       }
@@ -109,24 +110,24 @@ export default function App() {
    * Callback when onboarding is successfully completed.
    * @param {object} data Student onboarding details.
    */
-  const handleOnboardingComplete = (data) => {
+  const handleOnboardingComplete = useCallback((data) => {
     setStudentInfo(data);
     setStreakData({ currentStreak: 0, lastCheckInDate: null });
     setShowNudge(true);
-  };
+  }, []);
 
   /**
    * Callback when daily check-in is successfully completed.
    * @param {object} updatedStreak Updated streak details.
    */
-  const handleCheckInComplete = (updatedStreak) => {
+  const handleCheckInComplete = useCallback((updatedStreak) => {
     setStreakData(updatedStreak);
     setShowNudge(false); // Hide nudge on checkin
     setStudentInfo(prev => ({
       ...prev,
       currentStreak: updatedStreak.currentStreak
     }));
-  };
+  }, []);
 
   if (loading) {
     return <LoadingScreen />;

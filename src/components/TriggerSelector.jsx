@@ -1,3 +1,4 @@
+import { memo } from "react";
 import PropTypes from "prop-types";
 import { TRIGGERS_LIST } from "../constants";
 
@@ -11,7 +12,7 @@ import { TRIGGERS_LIST } from "../constants";
  * @param {boolean} [props.isSubmitting] True if check-in submission is active.
  * @returns {React.ReactElement} TriggerSelector component.
  */
-export default function TriggerSelector({ selectedTrigger, onSelectTrigger, isSubmitting }) {
+const TriggerSelector = memo(function TriggerSelector({ selectedTrigger, onSelectTrigger, isSubmitting }) {
   return (
     <div className="trigger-grid" role="group" aria-label="Stress triggers selection">
       {TRIGGERS_LIST.map((t) => (
@@ -28,7 +29,7 @@ export default function TriggerSelector({ selectedTrigger, onSelectTrigger, isSu
       ))}
     </div>
   );
-}
+});
 
 TriggerSelector.propTypes = {
   selectedTrigger: PropTypes.string,
@@ -40,3 +41,5 @@ TriggerSelector.defaultProps = {
   selectedTrigger: null,
   isSubmitting: false
 };
+
+export default TriggerSelector;

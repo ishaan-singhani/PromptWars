@@ -1,7 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import PropTypes from "prop-types";
 import { saveMoodCheckIn, getMoodHistory } from "../firebase";
+import { logError } from "../utils/logger";
 import { generateWellnessTip } from "../gemini";
+import { isValidMood, isValidTrigger } from "../utils/validation";
 import MoodSelector from "./MoodSelector";
 import TriggerSelector from "./TriggerSelector";
 import LoggedStateCard from "./LoggedStateCard";
@@ -55,7 +57,7 @@ export default function DailyCheckIn({ uid, studentInfo, streakData, onCheckInCo
             setAiTip(tip);
           }
         } catch (err) {
-          console.error("Failed to load today's check-in details:", err);
+          logError("Failed to load today's check-in details", err);
         } finally {
           setIsLoadingTip(false);
         }
@@ -68,12 +70,22 @@ export default function DailyCheckIn({ uid, studentInfo, streakData, onCheckInCo
     checkTodayStatus();
   }, [uid, streakData, studentInfo]);
 
-  const handleSubmit = async () => {
-    if (!selectedMood) {
+  const handleSelectMood = useCallback((m) => {
+    setSelectedMood(m);
+    setError("");
+  }, []);
+
+  const handleSelectTrigger = useCallback((t) => {
+    setSelectedTrigger(t);
+    setError("");
+  }, []);
+
+  const handleSubmit = useCallback(async () => {
+    if (!selectedMood || !isValidMood(selectedMood)) {
       setError("Please select a mood first.");
       return;
     }
-    if (!selectedTrigger) {
+    if (!selectedTrigger || !isValidTrigger(selectedTrigger)) {
       setError("Please select what is affecting you most.");
       return;
     }
@@ -97,13 +109,13 @@ export default function DailyCheckIn({ uid, studentInfo, streakData, onCheckInCo
         onCheckInComplete(result.streak);
       }
     } catch (err) {
-      console.error("Check-in error:", err);
+      logError("Check-in error", err);
       setError("Failed to submit check-in. Please try again.");
     } finally {
       setIsSubmitting(false);
       setIsLoadingTip(false);
     }
-  };
+  }, [selectedMood, selectedTrigger, uid, studentInfo, onCheckInComplete]);
 
   if (hasCheckedInToday) {
     return (
@@ -126,10 +138,7 @@ export default function DailyCheckIn({ uid, studentInfo, streakData, onCheckInCo
 
         <MoodSelector
           selectedMood={selectedMood}
-          onSelectMood={(m) => {
-            setSelectedMood(m);
-            setError("");
-          }}
+          onSelectMood={handleSelectMood}
           disabled={isSubmitting}
         />
 
@@ -140,10 +149,7 @@ export default function DailyCheckIn({ uid, studentInfo, streakData, onCheckInCo
           </h3>
           <TriggerSelector
             selectedTrigger={selectedTrigger}
-            onSelectTrigger={(t) => {
-              setSelectedTrigger(t);
-              setError("");
-            }}
+            onSelectTrigger={handleSelectTrigger}
             disabled={isSubmitting}
           />
         </div>

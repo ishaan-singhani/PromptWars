@@ -1,3 +1,4 @@
+import React from "react";
 import PropTypes from "prop-types";
 import { MOODS_LIST } from "../constants";
 import WellnessTip from "./WellnessTip";
@@ -13,7 +14,7 @@ import WellnessTip from "./WellnessTip";
  * @param {object} props.studentInfo Profile details of the student.
  * @returns {React.ReactElement} Checked-in dashboard segment.
  */
-export default function LoggedStateCard({ todaysEntry, aiTip, isLoadingTip, studentInfo }) {
+const LoggedStateCard = React.memo(function LoggedStateCard({ todaysEntry, aiTip, isLoadingTip, studentInfo }) {
   const activeMood = MOODS_LIST.find(m => m.value === todaysEntry?.mood);
 
   return (
@@ -42,7 +43,7 @@ export default function LoggedStateCard({ todaysEntry, aiTip, isLoadingTip, stud
       />
     </div>
   );
-}
+});
 
 LoggedStateCard.propTypes = {
   todaysEntry: PropTypes.shape({
@@ -57,3 +58,5 @@ LoggedStateCard.propTypes = {
     targetExam: PropTypes.string
   })
 };
+
+export default LoggedStateCard;

@@ -1,3 +1,4 @@
+import { memo } from "react";
 import PropTypes from "prop-types";
 import { MOODS_LIST } from "../constants";
 
@@ -11,7 +12,7 @@ import { MOODS_LIST } from "../constants";
  * @param {boolean} [props.isSubmitting] True if check-in is in progress.
  * @returns {React.ReactElement} MoodSelector component.
  */
-export default function MoodSelector({ selectedMood, onSelectMood, isSubmitting }) {
+const MoodSelector = memo(function MoodSelector({ selectedMood, onSelectMood, isSubmitting }) {
   return (
     <div className="mood-selector" role="radiogroup" aria-label="Daily mood selector">
       {MOODS_LIST.map((m) => (
@@ -31,7 +32,7 @@ export default function MoodSelector({ selectedMood, onSelectMood, isSubmitting 
       ))}
     </div>
   );
-}
+});
 
 MoodSelector.propTypes = {
   selectedMood: PropTypes.string,
@@ -43,3 +44,5 @@ MoodSelector.defaultProps = {
   selectedMood: null,
   isSubmitting: false
 };
+
+export default MoodSelector;
